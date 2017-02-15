@@ -23,6 +23,8 @@
 #define m_p make_pair
 #define all(v) (v.begin(),v.end())
 using namespace std;
+//for the ith node (2*i+1)th node is the left child
+//and (2*i+2)th node is the right child
 pair<pair<int,int>,int> intree[1000006];//the interval tree
 //each node is of the form node.F.F=>low,node.F.S=:high;
 //node.S=>max value of high in the subtree routed at node;
@@ -33,15 +35,15 @@ void insert_interval(pair<int,int> p,int i)
 {
     if(!visited[i])
     {
-        intree[i]=make_pair(p,p.S);
+        intree[i]=make_pair(p,p.S);//interval added
         visited[i]=1;
         return;
     }
     intree[i].S=max(intree[i].S,p.S);
     if(p.F<intree[i].F.F)
-        insert_interval(p,2*i+1);
+        insert_interval(p,2*i+1);//goes to the left subtree
     else
-        insert_interval(p,2*i+2);
+        insert_interval(p,2*i+2);//goes to the right subtree
 }
 void find_interval(pair<int,int> p,int i)
 {
@@ -55,10 +57,10 @@ void find_interval(pair<int,int> p,int i)
     if(visited[2*i+1])
     {
         if(intree[2*i+1].S>=p.F)
-            find_interval(p,2*i+1);
+            find_interval(p,2*i+1);//goes to the left subtree
     }
     else
-        find_interval(p,2*i+2);
+        find_interval(p,2*i+2);//goes to the right subtree
 }
 int main()
 {
