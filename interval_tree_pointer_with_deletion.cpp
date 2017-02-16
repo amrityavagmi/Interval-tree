@@ -33,6 +33,20 @@ struct node
     bool clr;//color of the node
     node *left,*right,*papa;//the left child, right child and the parent nodes
 };
+void correct(node *root)
+{
+    if(root==NULL)
+        return;
+    correct(root->left);
+    correct(root->right);
+    if(root->left!=NULL&&root->right!=NULL)
+        root->maxi=max(root->maxi,max(root->left->maxi,root->right->maxi));
+    else if(root->left!=NULL)
+        root->maxi=max(root->maxi,root->left->maxi);
+    else if(root->right!=NULL)
+        root->maxi=max(root->maxi,root->right->maxi);
+    return;
+}
 node *insert_node(node *root,node *curr)//inserting the node
 {
     if(root==NULL)
@@ -184,34 +198,6 @@ node *next_node(node* cur)
     }
     return temp;
 }
-
-void delete_node(node *root,node* curr)
-{
-    node *temp1=new node,*temp2=new node;
-    if(curr->left==NULL || curr->right==NULL)
-        temp1=curr;
-    else
-        temp1=next_node(curr);
-
-    if(temp1->left!=NULL)
-        temp2=temp1->left;
-    else
-        temp2=temp1->right;
-
-    temp2->p=temp1->p;
-    if(temp1->papa==NULL)
-        root=temp2;
-    else if(temp1==temp1->papa->left)
-        temp1->papa->left=temp2;
-    else
-        temp1->papa->right=temp2;
-    if(temp1!=curr)
-    {
-        curr->p.F=temp1->p.F;
-    }
-    if(temp1->clr==black)
-        refresh(root,temp2);
-}
 node *exact_find(node *root,pair<int,int> p)
 {
     if(p.F==root->p.F&&p.S==root->p.S)
@@ -221,6 +207,46 @@ node *exact_find(node *root,pair<int,int> p)
     else
         return exact_find(root->right,p);
 }
+
+void delete_node(node *root,pair<int,int> p)//deletes a node
+{
+    node *curr=exact_find(root,p);
+    node *temp1=new node,*temp2=new node;
+    int gh=0;
+    //cout<<gh++<<endl;
+    if(curr->left==NULL || curr->right==NULL)
+        temp1=curr;
+    else
+        temp1=next_node(curr);
+    //cout<<gh++<<endl;
+
+    if(temp1->left!=NULL)
+        temp2=temp1->left;
+    else
+        temp2=temp1->right;
+
+
+    temp2->papa=temp1->papa;
+    if(temp1->papa==NULL)
+        root=temp2;
+    else if(temp1==temp1->papa->left)
+    {
+        temp1->papa->left=temp2;
+        //cout<<gh++<<endl;
+    }
+    else
+        temp1->papa->right=temp2;
+    //cout<<gh++<<endl;
+    if(temp1!=curr)
+    {
+        curr->p.F=temp1->p.F;
+    }
+    //cout<<gh++<<endl;
+    if(temp1->clr==black)
+        refresh(root,temp2);
+    //cout<<gh++<<endl;
+}
+
 int main()
 {
     ios::sync_with_stdio(0);
@@ -240,6 +266,7 @@ int main()
         curr->left=curr->right=curr->papa=NULL;
         root=insert_node(root,curr);
         refresh(root,curr);
+        correct(root);
     }
     cout<<"the in-order traversal of the tree is\n";
     print(root);
@@ -256,10 +283,11 @@ int main()
         if(!hollow)
             cout<<"interval not found :("<<endl;
     }
-    cout<<"enter the node to delete\n";
-    cin>>a.F>>a.S;
-    delete_node(root,exact_find(root,a));
-    cout<<"node deleted\n";
+//    cout<<"enter the node to delete\n";
+//    cin>>a.F>>a.S;
+//    delete_node(root,a);
+//    correct(root);
+//    cout<<"node deleted\n";
     return 0;
 }
 
